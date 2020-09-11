@@ -2,8 +2,6 @@ import networkx as nx
 
 # BOND GRAPHS
 
-
-
 class system(object):
     def __init__(self, bondlist=[]):
         self.bonds = bondlist # list of bonds
@@ -54,6 +52,12 @@ class system(object):
                 return bond
         return None
 
+    def get_bond_bynum(self,num):
+        for bond in self.bonds:
+            if bond.num == num:
+                return bond
+        return None
+
     def get_bond_num(self,e1,e2):
         for bond in self.bonds:
             if bond.nrs == e1 and bond.nls == e2:
@@ -79,14 +83,6 @@ class system(object):
         return rstring
 
 
-class SE(object):
-    def __init__(self, name=None, bond):
-        self.name = name
-        self.etype = 'SE'
-        self.bond = bond
-
-    def __str__(self):
-        return f'{self.etype}:{self.name:5s}, {bond}'
 
 
 class element(object):
@@ -106,6 +102,8 @@ class element(object):
             return 'SF'
         elif self.name.startswith('R'):
             return 'R'
+        elif self.name.startswith('I'):
+            return 'I'
         elif self.name.startswith('C'):
             return 'C'
         elif self.name.startswith('0J'):
@@ -125,6 +123,31 @@ class element(object):
             self.value = 'f'
             return self.value
 
+class elem_SE(element):
+    def __init__(self, name, bond):
+        super().__init__(name)
+        self.bond = bond
+        self.value = 'E'
+        self.e = self.value
+
+        # set the bond energy
+        bond.set_e(self.value)
+
+    def __str__(self):
+        return f'{self.etype}:{self.name:5s}, {self.bond}'
+
+class elem_I(element):
+    def __init__(self, name, bond):
+        super().__init__(name)
+        self.bond = bond
+        self.value = 'p/I'
+        self.f = self.value
+
+        # set the bond energy
+        bond.set_f(self.value)
+
+    def __str__(self):
+        return f'{self.etype}:{self.name:5s}, {self.bond}'
 
 
 class bond(object):
@@ -132,6 +155,8 @@ class bond(object):
         self.nls = node_left
         self.nrs = node_right
         self.num = number
+        self.e = 'e' + "_" + str(self.num)
+        self.f = 'f' + "_" + str(self.num)
         if isinstance(stroke_dir, direction):
             self.csd = stroke_dir.get_dir()
         else:
@@ -140,6 +165,11 @@ class bond(object):
             self.ped = pos_e_dir.get_dir()
         else:
             self.ped = get_dir_from_str(pos_e_dir)
+    def set_e(self, e):
+        self.e = e + "_" + str(self.num)
+
+    def set_f(self, f):
+        self.f = f + "_" + str(self.num)
 
     def __str__(self):
         CSL = '|'
