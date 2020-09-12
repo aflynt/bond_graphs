@@ -1,4 +1,17 @@
 t forbes brown
+✓ 
+✓
+✗
+
+[✓] SE
+[✓] I
+[✓] SF
+[✓] R
+[✓] C
+
+[ ] TF
+[ ] 0J
+[ ] 1J
 
 element = {
   type = {
@@ -171,3 +184,8 @@ edge properties
 
 
 # make a dict with all the nodes from the bonds
+
+
+
+
+

@@ -35,11 +35,13 @@ class system(object):
                 bdict[nrs].append(nls)
         return bdict
 
-
-    def elem_gives(self,elem):
-        for nbr in self.elem_nbrs[elem]:
-            bond_num = self.get_bond_num(elem,nbr)
-
+    def get_elem_bonds(self, elem):
+        bonds = []
+        nbrs = self.elem_nbrs[elem]
+        for nbr in nbrs:
+            b = self.get_bond(elem, nbr)
+            bonds.append(b)
+        return bonds
 
     def get_nbrs(self,elem):
         return self.elem_nbrs[elem]
@@ -73,6 +75,14 @@ class system(object):
             if num_friends == 1:
                 sp.append(p)
         return sp
+
+    def get_two_ports(self):
+        elist = []
+        for p in list(self.G.nodes):
+            num_friends = len(self.elem_nbrs[p])
+            if num_friends == 2:
+                elist.append(p)
+        return elist
 
     def __repr__(self):
         rstring  = "system(["
@@ -123,31 +133,105 @@ class element(object):
             self.value = 'f'
             return self.value
 
-class elem_SE(element):
-    def __init__(self, name, bond):
+class elem_SF(element):
+    def __init__(self, name):
         super().__init__(name)
-        self.bond = bond
-        self.value = 'E'
+        self.value = 'F(t)'
+        self.f = self.value
+
+class elem_SE(element):
+    def __init__(self, name):
+        super().__init__(name)
+        self.value = 'E(t)'
         self.e = self.value
 
-        # set the bond energy
-        bond.set_e(self.value)
-
-    def __str__(self):
-        return f'{self.etype}:{self.name:5s}, {self.bond}'
-
 class elem_I(element):
-    def __init__(self, name, bond):
+    def __init__(self, name):
         super().__init__(name)
-        self.bond = bond
         self.value = 'p/I'
         self.f = self.value
 
-        # set the bond energy
-        bond.set_f(self.value)
+class elem_C(element):
+    def __init__(self, name):
+        super().__init__(name)
+        self.value = 'q/C'
+        self.e = self.value
 
-    def __str__(self):
-        return f'{self.etype}:{self.name:5s}, {self.bond}'
+class elem_R(element):
+    def __init__(self, name):
+        super().__init__(name)
+        self.value = 'R'
+        self.e = self.value + '*f'
+        self.f = 'e/'+self.value
+
+class elem_TF(element):
+    def __init__(self, name, b1, b2):
+        super().__init__(name)
+        self.value = 'm'
+
+        # two ports
+        self.p1 = {
+                'e' : name+'.'+'p1.e',
+                'f' : name+'.'+'p1.f',
+                'b' : b1,
+             }
+        self.p2 = {
+                'e' : name+'.'+'p2.e',
+                'f' : name+'.'+'p2.f',
+                'b' : b2,
+             }
+        # set working bond to p1.bond
+        b = self.p1['b']
+
+        # TF_elem is on right side
+        if b.nrs == name:
+            #print(f'[OK] NODE R is {e}')
+            # check causal stroke direction
+            #print(f'CS dir = {b.csd}')
+                
+            if b.csd == 'L':    
+                #print('wow. Causal stroke is on the left!')    
+                #print('TF is getting flow from the 1st bond')    
+                self.p2['f'] = 'm*' + self.p1['f']    
+                self.p1['e'] = 'm*' + self.p2['e']    
+
+                # push values to bonds
+                self.p2['b'].set_f(self.p2['f'])
+                self.p1['b'].set_e(self.p1['e'])
+            else:    
+                #print('wowzer. cs is on the Right')
+                #print('TF is getting effort from the 1st bond')
+                self.p1['f'] = self.p2['f'] + '/m'
+                self.p2['e'] = self.p1['e'] + '/m'
+
+                # push values to bonds
+                self.p1['b'].set_f(self.p1['f'])
+                self.p2['b'].set_e(self.p2['e'])
+                
+        # TF_elem is on the left side
+        else:
+            #print(f'[OK] NODE L is {e}')
+            #print(b)
+            # check causal stroke direction
+            #print(f'CS dir = {b.csd}')
+            if b.csd == 'L':
+                #print('wow. Causal stroke is on the left!')
+                #print('TF is giving flow to the 1st bond')
+                self.p1['f'] = self.p2['f'] + '/m'
+                self.p2['e'] = self.p1['e'] + '/m'
+
+                # push values to bonds
+                self.p1['b'].set_f(self.p1['f'])
+                self.p2['b'].set_e(self.p2['e'])
+            else:
+                #print('wowzer. cs is on the Right')
+                #print('TF is giving effort to the 1st bond')
+                self.p2['f'] = 'm*' + self.p1['f']
+                self.p1['e'] = 'm*' + self.p2['e']
+
+                # push values to bonds
+                self.p2['b'].set_f(self.p2['f'])
+                self.p1['b'].set_e(self.p1['e'])
 
 
 class bond(object):
@@ -165,11 +249,28 @@ class bond(object):
             self.ped = pos_e_dir.get_dir()
         else:
             self.ped = get_dir_from_str(pos_e_dir)
+
     def set_e(self, e):
         self.e = e + "_" + str(self.num)
 
     def set_f(self, f):
         self.f = f + "_" + str(self.num)
+
+    def print_rev(self):
+        CSL = '|'
+        CSR = '|'
+        PEL = '>'
+        PER = '<'
+        if self.csd == 'R':
+            CSL = ' '
+        else:
+            CSR = ' '
+        if self.ped == 'R':
+            PEL = ' '
+        else:
+            PER = ' '
+        return f'[{self.nrs:5s}] {CSR}{PER}__{self.num:2d}__{PEL}{CSL} [{self.nls:5s}]'
+
 
     def __str__(self):
         CSL = '|'
@@ -206,7 +307,6 @@ class bond(object):
         num = int(bs.split('__')[1])
         NL = bs[1:6].strip()
         NR = bs[-6:-1].strip()
-        #print(f'im going to call with: bond({num}, {NL}, {NR}, {cs_dir}, {pe_dir})')
         return cls( num , NL, NR, cs_dir, pe_dir)
 
 
