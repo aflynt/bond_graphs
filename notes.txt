@@ -161,30 +161,47 @@ bond( 12 ,   'Rb', '1J-4 '  , 'R' , 'L')
 # bonds.append(bond.from_bond_string('[1J-1 ]   __ 2__>| [Rp3  ]' )
 # bonds.append(bond.from_bond_string('[1J-1 ] | __ 1__>  [Cacc2]' )
 
-## 
-## N0
-## |
-## +-- N1
-## |
-## +-- N2
-## |
-## +-- N3
-## |
-## +-- N4
-## |
-## +-- N5
+ 
+
+# system
+  * add_bond(bond)
+  * get_elem_bonds(elem)
+  * get_nbrs(self,elem)
+  * get_bond(self,e1,e2)
+  * get_bond_bynum(self,num)
+  * get_bond_num(self,e1,e2)
+  * get_single_ports(self)
+  * get_two_ports(self)
+
+# bond
+  props: [nls, nrs, num, e, f, csd, ped]
+  *  set_e(self, e):
+  *  set_f(self, f):
+  *  print_rev(self):
+  *  is_ped_into_elem(self,elem_name)
+
+# element
+  props: [etype, name, ports,value]
+  * get_value
+
+# elem_TF
+  props: [value, p1, p2]
+  p1 = {e,f,b}
+  p2 = {e,f,b}
+
+# elem_0J
+  props: [bonds]
+  strong_bond
+
+  # find strong bond
+  *  get_sb()
+  *  print_bonds()
+  *  set_e()
+  *  set_f()
+  *  sumfs(bcurr)
 
 
-# edge properties
-#   num
-#   nls
-#   nrs
-#   csd [LR]
-#   ped [LR]
 
 
-# make a dict with all the nodes from the bonds
 
-#system
-# add-bond(bond)
-# get-elem-bonds(elem)
+

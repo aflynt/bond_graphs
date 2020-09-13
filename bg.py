@@ -2,6 +2,117 @@ import networkx as nx
 
 # BOND GRAPHS
 
+class bond(object):
+    def __init__(self, number, node_left, node_right, stroke_dir, pos_e_dir):
+        self.nls = node_left
+        self.nrs = node_right
+        self.num = number
+        self.e = 'e' + "_" + str(self.num)
+        self.f = 'f' + "_" + str(self.num)
+        if isinstance(stroke_dir, direction):
+            self.csd = stroke_dir.get_dir()
+        else:
+            self.csd = get_dir_from_str(stroke_dir)
+        if isinstance(pos_e_dir, direction):
+            self.ped = pos_e_dir.get_dir()
+        else:
+            self.ped = get_dir_from_str(pos_e_dir)
+
+    def set_e(self, e):
+        self.e = e + "_" + str(self.num)
+
+    def set_f(self, f):
+        self.f = f + "_" + str(self.num)
+
+    def print_rev(self):
+        CSL = '|'
+        CSR = '|'
+        PEL = '>'
+        PER = '<'
+        if self.csd == 'R':
+            CSL = ' '
+        else:
+            CSR = ' '
+        if self.ped == 'R':
+            PEL = ' '
+        else:
+            PER = ' '
+        return f'[{self.nrs:5s}] {CSR}{PER}__{self.num:2d}__{PEL}{CSL} [{self.nls:5s}]'
+
+    def is_ped_into_elem(self,elem_name):
+        if self.nls == elem_name and self.ped == 'L':
+            return True
+        elif self.nrs == elem_name and self.ped == 'R':
+            return True
+        else:
+            return False
+
+    def __str__(self):
+        CSL = '|'
+        CSR = '|'
+        PEL = '<'
+        PER = '>'
+        if self.csd == 'R':
+            CSL = ' '
+        else:
+            CSR = ' '
+        if self.ped == 'R':
+            PEL = ' '
+        else:
+            PER = ' '
+        return f'[{self.nls:5s}] {CSL}{PEL}__{self.num:2d}__{PER}{CSR} [{self.nrs:5s}]'
+
+    def __repr__(self):
+        return f'bond({self.num},"{self.nls}","{self.nrs}", "{self.csd}", "{self.ped}")'
+
+    @classmethod
+    def from_bond_string(cls, bs):
+        csl = bs[8]
+        pel = bs[9]
+        if csl == '|':
+          cs_dir = 'L'
+        else:
+          cs_dir = 'R'
+
+        if pel == '<':
+          pe_dir = 'L'
+        else:
+          pe_dir = 'R'
+
+        num = int(bs.split('__')[1])
+        NL = bs[1:6].strip()
+        NR = bs[-6:-1].strip()
+        return cls( num , NL, NR, cs_dir, pe_dir)
+
+class direction:
+    def __init__(self, pos):
+        self.pos = get_dir_from_str(pos)
+
+    def __call__(self, pos):
+        return get_dir_from_str(pos)
+
+    def __repr__(self):
+        return f'direction(\"{self.pos}\")'
+
+    def __str__(self):
+        return f'{self.pos}'
+
+    def get_dir(self):
+        return f'{self.pos}'
+
+def get_dir_from_str(instr):
+    tmpstr = instr.lower()
+    #print(f'instr = {instr}, now tmpstr = {tmpstr}')
+    if tmpstr == 'r':
+        #print('tmpstr is equal to r, returning R')
+        return f'R'
+    elif tmpstr == 'right':
+        #print('tmpstr is equal to right, returning R')
+        return f'R'
+    else:
+        #print('tmpstr else, returning L')
+        return f'L'
+
 class system(object):
     def __init__(self, bondlist=[]):
         self.bonds = bondlist # list of bonds
@@ -91,8 +202,6 @@ class system(object):
             rstring += bstring
         rstring += '])'
         return rstring
-
-
 
 
 class element(object):
@@ -233,111 +342,69 @@ class elem_TF(element):
                 self.p2['b'].set_f(self.p2['f'])
                 self.p1['b'].set_e(self.p1['e'])
 
+class elem_0J(element):
+    def __init__(self, name, bonds):
+        super().__init__(name)
+        self.bonds = bonds
+        self.sb = self.get_sb()
+        # set the efforts on each bond
+        self.set_e()
 
-class bond(object):
-    def __init__(self, number, node_left, node_right, stroke_dir, pos_e_dir):
-        self.nls = node_left
-        self.nrs = node_right
-        self.num = number
-        self.e = 'e' + "_" + str(self.num)
-        self.f = 'f' + "_" + str(self.num)
-        if isinstance(stroke_dir, direction):
-            self.csd = stroke_dir.get_dir()
-        else:
-            self.csd = get_dir_from_str(stroke_dir)
-        if isinstance(pos_e_dir, direction):
-            self.ped = pos_e_dir.get_dir()
-        else:
-            self.ped = get_dir_from_str(pos_e_dir)
+        self.tmp_fs = []
+        for b in bonds:
+            self.tmp_fs.append(b.f)
 
-    def set_e(self, e):
-        self.e = e + "_" + str(self.num)
+        self.set_f()
 
-    def set_f(self, f):
-        self.f = f + "_" + str(self.num)
+    # find strong bond
+    def get_sb(self):
+        self.sb = self.bonds[0]
+        for bond in self.bonds:
+            if bond.nls == self.name:
+                if bond.csd == 'L':
+                    self.sb = bond
+            else:
+                if bond.csd == 'R':
+                    self.sb = bond
+        return self.sb
 
-    def print_rev(self):
-        CSL = '|'
-        CSR = '|'
-        PEL = '>'
-        PER = '<'
-        if self.csd == 'R':
-            CSL = ' '
-        else:
-            CSR = ' '
-        if self.ped == 'R':
-            PEL = ' '
-        else:
-            PER = ' '
-        return f'[{self.nrs:5s}] {CSR}{PER}__{self.num:2d}__{PEL}{CSL} [{self.nls:5s}]'
+    def print_bonds(self):
+        for bond in self.bonds:
+            if bond.nls == self.name:
+                print(bond)
+            else:
+                print(bond.print_rev())
 
+    def set_e(self):
+        for b in self.bonds:
+            if b != self.sb:
+                b.set_e(self.sb.e)
 
-    def __str__(self):
-        CSL = '|'
-        CSR = '|'
-        PEL = '<'
-        PER = '>'
-        if self.csd == 'R':
-            CSL = ' '
-        else:
-            CSR = ' '
-        if self.ped == 'R':
-            PEL = ' '
-        else:
-            PER = ' '
-        return f'[{self.nls:5s}] {CSL}{PEL}__{self.num:2d}__{PER}{CSR} [{self.nrs:5s}]'
+    def set_f(self):
+        for b in self.bonds:
+            fstring = ""
+            s = self.sumfs(b)
+            # is pos energy into 0J element?
+            if b.is_ped_into_elem(self.name):
+                fstring = "-("+s+")"
+            else:
+                fstring = "+("+s+")"
+            b.set_f(fstring)
 
-    def __repr__(self):
-        return f'bond({self.num},"{self.nls}","{self.nrs}", "{self.csd}", "{self.ped}")'
+    def sumfs(self, bcurr):
+        s = ""
+        #for b in self.bonds:
 
-    @classmethod
-    def from_bond_string(cls, bs):
-        csl = bs[8]
-        pel = bs[9]
-        if csl == '|':
-          cs_dir = 'L'
-        else:
-          cs_dir = 'R'
+        for i in range(len(self.bonds)):
+            tmp_f = self.tmp_fs[i]
+            b = self.bonds[i]
+            if b != bcurr:
+                if b.is_ped_into_elem(self.name):
+                    #s += " +"+"f_"+str(b.num)
+                    s += " +"+tmp_f
+                else:
+                    #s += " -"+"f_"+str(b.num)
+                    s += " -"+tmp_f
+        return s
 
-        if pel == '<':
-          pe_dir = 'L'
-        else:
-          pe_dir = 'R'
-
-        num = int(bs.split('__')[1])
-        NL = bs[1:6].strip()
-        NR = bs[-6:-1].strip()
-        return cls( num , NL, NR, cs_dir, pe_dir)
-
-
-
-
-class direction:
-    def __init__(self, pos):
-        self.pos = get_dir_from_str(pos)
-
-    def __call__(self, pos):
-        return get_dir_from_str(pos)
-
-    def __repr__(self):
-        return f'direction(\"{self.pos}\")'
-
-    def __str__(self):
-        return f'{self.pos}'
-
-    def get_dir(self):
-        return f'{self.pos}'
-
-def get_dir_from_str(instr):
-    tmpstr = instr.lower()
-    #print(f'instr = {instr}, now tmpstr = {tmpstr}')
-    if tmpstr == 'r':
-        #print('tmpstr is equal to r, returning R')
-        return f'R'
-    elif tmpstr == 'right':
-        #print('tmpstr is equal to right, returning R')
-        return f'R'
-    else:
-        #print('tmpstr else, returning L')
-        return f'L'
 
