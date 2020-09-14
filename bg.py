@@ -296,17 +296,17 @@ class elem_TF(element):
             #print(f'[OK] NODE R is {e}')
             # check causal stroke direction
             #print(f'CS dir = {b.csd}')
-                
-            if b.csd == 'L':    
-                #print('wow. Causal stroke is on the left!')    
-                #print('TF is getting flow from the 1st bond')    
-                self.p2['f'] = 'm*' + self.p1['f']    
-                self.p1['e'] = 'm*' + self.p2['e']    
+
+            if b.csd == 'L':
+                #print('wow. Causal stroke is on the left!')
+                #print('TF is getting flow from the 1st bond')
+                self.p2['f'] = 'm*' + self.p1['f']
+                self.p1['e'] = 'm*' + self.p2['e']
 
                 # push values to bonds
                 self.p2['b'].set_f(self.p2['f'])
                 self.p1['b'].set_e(self.p1['e'])
-            else:    
+            else:
                 #print('wowzer. cs is on the Right')
                 #print('TF is getting effort from the 1st bond')
                 self.p1['f'] = self.p2['f'] + '/m'
@@ -315,7 +315,7 @@ class elem_TF(element):
                 # push values to bonds
                 self.p1['b'].set_f(self.p1['f'])
                 self.p2['b'].set_e(self.p2['e'])
-                
+
         # TF_elem is on the left side
         else:
             #print(f'[OK] NODE L is {e}')

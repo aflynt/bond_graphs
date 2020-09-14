@@ -1,5 +1,5 @@
 t forbes brown
-✓ 
+✓
 ✓
 ✗
 
@@ -91,6 +91,40 @@ bond( 14 , '1J-5', 'TF.Ab'  , 'L' , 'L')
 bond( 13 ,'TF.Ab', '1J-4 '  , 'L' , 'L')
 bond( 12 ,   'Rb', '1J-4 '  , 'R' , 'L')
 
+e_dict = {
+  1: ...
+  2: ...
+  3: ...
+  4: ...
+  5: ...
+  6: ...
+  7: ...
+  8: ...
+}
+
+f_dict = {
+  1: ...
+  2: ...
+  3: ...
+  4: ...
+  5: ...
+  6: ...
+  7: ...
+  8: ...
+}
+
+# simple model system
+01234567890123456789012345
+[NodeL] |<__nn__>| [NodeR]
+[SE   ]   __ 1__>| [1J   ]
+[I2   ] |<__ 2__   [1J   ]
+[C3   ]  <__ 3__ | [1J   ]
+[1J   ] | __ 4__>  [R    ]
+[1J   ] | __ 5__>  [TF_m ]
+[TF_m ] | __ 6__>  [0J   ]
+[0J   ] | __ 7__>  [C7   ]
+[0J   ]   __ 8__>| [I8   ]
+
 
 # 01234567890123456789012345
 # [NodeL] |<__nn__>| [NodeR]
@@ -100,7 +134,7 @@ bond( 12 ,   'Rb', '1J-4 '  , 'R' , 'L')
 # [1J-6 ] | __20__>  [Rv70 ]
 # [1J-6 ] | __21__>  [Rv20 ]
 # [1J-6 ] | __22__>  [0J-1 ]
-# 
+#
 #  12345              12345
 # [SE   ]  <__16__ | [1J-5 ]
 # [1J-4 ] |<__11__   [0J-1 ]
@@ -114,16 +148,16 @@ bond( 12 ,   'Rb', '1J-4 '  , 'R' , 'L')
 # [0J-2 ]   __ 3__>| [1J-1 ]
 # [1J-1 ]   __ 2__>| [Rp3  ]
 # [1J-1 ] | __ 1__>  [Cacc2]
-# 
-# 
-# 
+#
+#
+#
 # bonds.append(bond.from_bond_string('[1J-5 ] | __17__>  [TF.an]' )
 # bonds.append(bond.from_bond_string('[TF.an] | __18__>  [1J-6 ]' )
 # bonds.append(bond.from_bond_string('[Ra   ]  <__19__ | [1J-6 ]' )
 # bonds.append(bond.from_bond_string('[1J-6 ] | __20__>  [Rv70 ]' )
 # bonds.append(bond.from_bond_string('[1J-6 ] | __21__>  [Rv20 ]' )
 # bonds.append(bond.from_bond_string('[1J-6 ] | __22__>  [0J-1 ]' )
-# 
+#
 # bonds.append(bond.from_bond_string('[SE   ]  <__16__ | [1J-5 ]' )
 # bonds.append(bond.from_bond_string('[1J-4 ] |<__11__   [0J-1 ]' )
 # bonds.append(bond.from_bond_string('[0J-1 ] | __10__>  [1J-3 ]' )
@@ -136,6 +170,31 @@ bond( 12 ,   'Rb', '1J-4 '  , 'R' , 'L')
 # bonds.append(bond.from_bond_string('[0J-2 ]   __ 3__>| [1J-1 ]' )
 # bonds.append(bond.from_bond_string('[1J-1 ]   __ 2__>| [Rp3  ]' )
 # bonds.append(bond.from_bond_string('[1J-1 ] | __ 1__>  [Cacc2]' )
+
+TFE system
+system([bond(15,"I","1J-5","L", "L"),
+bond(14,"1J-5","TF.Ab","L", "L"),
+bond(13,"TF.Ab","1J-4","L", "L"),
+bond(12,"Rb","1J-4","R", "L"),
+bond(16,"SE","1J-5","R", "L"),
+bond(11,"1J-4","0J-1","L", "L"),
+bond(10,"0J-1","1J-3","L", "R"),
+bond(9,"Rv40","1J-3","R", "L"),
+bond(8,"1J-3","Rl40","L", "R"),
+bond(7,"1J-3","0J-2","L", "R"),
+bond(6,"1J-2","Cacc1","L", "R"),
+bond(5,"Rp2","1J-2","R", "L"),
+bond(4,"0J-2","1J-2","L", "R"),
+bond(3,"0J-2","1J-1","R", "R"),
+bond(2,"1J-1","Rp3","R", "R"),
+bond(1,"1J-1","Cacc2","L", "R"),
+bond(17,"1J-5","TF.an","L", "R"),
+bond(18,"TF.an","1J-6","L", "R"),
+bond(19,"Ra","1J-6","R", "L"),
+bond(20,"1J-6","Rv70","L", "R"),
+bond(21,"1J-6","Rv20","L", "R"),
+bond(22,"1J-6","0J-1","L", "R"),
+])
 
 # system
   * add_bond(bond)
@@ -178,6 +237,4 @@ bond( 12 ,   'Rb', '1J-4 '  , 'R' , 'L')
   *  set_f()
   *  set_e()
   *  sumes(bcurr)
-✓ 
-
 
