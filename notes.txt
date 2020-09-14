@@ -10,33 +10,8 @@ t forbes brown
 [✓] C
 
 [✓] TF
-[ ] 0J
-[ ] 1J
-
-element = {
-  type = {
-    SE
-    SF
-    R
-    C
-    I
-    TF
-    0J
-    1J
-  }
-  nports = {
-    1
-    2
-    n
-  }
-  bonds = {
-  }
-  gives = {
-    e
-    f
-  }
-}
-
+[✓] 0J
+[✓] 1J
 
 
 single-port elements
@@ -67,6 +42,7 @@ IF name[0] == 'S':
 # |_1_ TF |_2_
     e1 = m e2
   m f1 = f2
+
 #  _1_| TF _2_|
     f1 = f2 / m
     e1 / m = e2
@@ -161,8 +137,6 @@ bond( 12 ,   'Rb', '1J-4 '  , 'R' , 'L')
 # bonds.append(bond.from_bond_string('[1J-1 ]   __ 2__>| [Rp3  ]' )
 # bonds.append(bond.from_bond_string('[1J-1 ] | __ 1__>  [Cacc2]' )
 
- 
-
 # system
   * add_bond(bond)
   * get_elem_bonds(elem)
@@ -190,18 +164,20 @@ bond( 12 ,   'Rb', '1J-4 '  , 'R' , 'L')
   p2 = {e,f,b}
 
 # elem_0J
-  props: [bonds]
-  strong_bond
-
-  # find strong bond
-  *  get_sb()
+  props: [bonds, sb]
   *  print_bonds()
+  *  get_sb()
   *  set_e()
   *  set_f()
   *  sumfs(bcurr)
 
-
-
-
+# elem_1J
+  props: [bonds, sb]
+  *  print_bonds()
+  *  get_sb()
+  *  set_f()
+  *  set_e()
+  *  sumes(bcurr)
+✓ 
 
 

@@ -203,7 +203,6 @@ class system(object):
         rstring += '])'
         return rstring
 
-
 class element(object):
     def __init__(self, name=None):
         self.name = name
@@ -347,14 +346,24 @@ class elem_0J(element):
         super().__init__(name)
         self.bonds = bonds
         self.sb = self.get_sb()
+
         # set the efforts on each bond
         self.set_e()
 
+        # store original flows
         self.tmp_fs = []
-        for b in bonds:
+        for b in self.bonds:
             self.tmp_fs.append(b.f)
 
+        # set the flows on each bond
         self.set_f()
+
+    def print_bonds(self):
+        for bond in self.bonds:
+            if bond.nls == self.name:
+                print(bond)
+            else:
+                print(bond.print_rev())
 
     # find strong bond
     def get_sb(self):
@@ -368,12 +377,6 @@ class elem_0J(element):
                     self.sb = bond
         return self.sb
 
-    def print_bonds(self):
-        for bond in self.bonds:
-            if bond.nls == self.name:
-                print(bond)
-            else:
-                print(bond.print_rev())
 
     def set_e(self):
         for b in self.bonds:
@@ -393,18 +396,85 @@ class elem_0J(element):
 
     def sumfs(self, bcurr):
         s = ""
-        #for b in self.bonds:
-
         for i in range(len(self.bonds)):
             tmp_f = self.tmp_fs[i]
             b = self.bonds[i]
             if b != bcurr:
                 if b.is_ped_into_elem(self.name):
-                    #s += " +"+"f_"+str(b.num)
-                    s += " +"+tmp_f
+                    s += " +"+"f_"+str(b.num)
+                    #s += " +"+tmp_f
                 else:
-                    #s += " -"+"f_"+str(b.num)
-                    s += " -"+tmp_f
+                    s += " -"+"f_"+str(b.num)
+                    #s += " -"+tmp_f
         return s
 
+class elem_1J(element):
+    def __init__(self, name, bonds):
+        super().__init__(name)
+        self.bonds = bonds
+        self.sb = self.get_sb()
+
+        # set the flows on each bond
+        self.set_f()  ## all same as sb
+
+        # store original efforts
+        self.tmp_es = []
+        for b in self.bonds:
+            self.tmp_es.append(b.e)
+
+        # set the efforts on each bond
+        self.set_e() # e = sumes
+
+    def print_bonds(self):
+        for bond in self.bonds:
+            if bond.nls == self.name:
+                print(bond)
+            else:
+                print(bond.print_rev())
+
+    # find strong bond
+    def get_sb(self):
+        self.sb = self.bonds[0]
+        for bond in self.bonds:
+            if bond.nls == self.name:
+                # [1J-L] ---| == SB
+                if bond.csd == 'R':
+                    self.sb = bond
+            else:
+                # |--- [1J-R]  == SB
+                if bond.csd == 'L':
+                    self.sb = bond
+        return self.sb
+
+
+    def set_f(self):
+        for b in self.bonds:
+            if b != self.sb:
+                b.set_f(self.sb.f)
+
+
+    def set_e(self):
+        for b in self.bonds:
+            fstring = ""
+            s = self.sumes(b)
+            # is pos energy into 1J element?
+            if b.is_ped_into_elem(self.name):
+                fstring = "-("+s+")"
+            else:
+                fstring = "+("+s+")"
+            b.set_e(fstring)
+
+    def sumes(self, bcurr):
+        s = ""
+        for i in range(len(self.bonds)):
+            tmp_e = self.tmp_es[i]
+            b = self.bonds[i]
+            if b != bcurr:
+                if b.is_ped_into_elem(self.name):
+                    s += " +"+"e_"+str(b.num)
+                    #s += " +"+tmp_e
+                else:
+                    s += " -"+"e_"+str(b.num)
+                    #s += " -"+tmp_e
+        return s
 
