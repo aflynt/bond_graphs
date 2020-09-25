@@ -1,9 +1,18 @@
 import networkx as nx
+import matplotlib.pylab as plt
+import re
+
+def warn(*args, **kwargs):
+    pass
+import warnings
+warnings.warn = warn
+
+myx = 1
 
 # BOND GRAPHS
 
 class bond(object):
-    def __init__(self, number, node_left, node_right, stroke_dir, pos_e_dir):
+    def __init__(self, number, node_left, node_right, stroke_dir, pos_e_dir):# {{{
         self.nls = node_left
         self.nrs = node_right
         self.num = number
@@ -84,10 +93,10 @@ class bond(object):
         num = int(bs.split('__')[1])
         NL = bs[1:6].strip()
         NR = bs[-6:-1].strip()
-        return cls( num , NL, NR, cs_dir, pe_dir)
+        return cls( num , NL, NR, cs_dir, pe_dir)# }}}
 
 class direction:
-    def __init__(self, pos):
+    def __init__(self, pos):# {{{
         self.pos = get_dir_from_str(pos)
 
     def __call__(self, pos):
@@ -100,10 +109,10 @@ class direction:
         return f'{self.pos}'
 
     def get_dir(self):
-        return f'{self.pos}'
+        return f'{self.pos}'# }}}
 
 def get_dir_from_str(instr):
-    tmpstr = instr.lower()
+    tmpstr = instr.lower()# {{{
     #print(f'instr = {instr}, now tmpstr = {tmpstr}')
     if tmpstr == 'r':
         #print('tmpstr is equal to r, returning R')
@@ -113,10 +122,10 @@ def get_dir_from_str(instr):
         return f'R'
     else:
         #print('tmpstr else, returning L')
-        return f'L'
+        return f'L'# }}}
 
 class system(object):
-    def __init__(self, bondlist=[]):
+    def __init__(self, bondlist=[]):# {{{
         self.bonds = bondlist # list of bonds
         self.elem_nbrs = self.build_elem_nbrs() # dict(e: nbrlist)
         self.G = nx.Graph(self.elem_nbrs) # graph of bonds to elems
@@ -129,6 +138,20 @@ class system(object):
         #    fstr = 'f_'+str(n)
         #    self.ef_dict[estr] = estr
         #    self.ef_dict[fstr] = fstr
+
+    def plot_system(self):
+        options = {
+                    'node_size' : 700,
+                    'width' : 3,
+                }
+        pos = nx.spring_layout(self.G)
+        nx.draw_networkx_nodes(  self.G, pos, **options)
+        nx.draw_networkx_edges(  self.G, pos, **options)
+        nx.draw_networkx_labels( self.G, pos, **options)
+        #with warnings.catch_warnings():
+        #    warnings.filterwarnings("ignore", category=DeprecationWarning)
+        plt.show()
+
 
     def update_ef_dicts(self, elem, bond):  # can only call with 1 or 2 port elements
             if elem_gives(elem.name, bond) == 'e': # gives e
@@ -185,12 +208,26 @@ class system(object):
         # add value only if key doesnt already exist
         if key not in self.ef_dict.keys():
             self.ef_dict[key] = value
+        else:
+            self.ef_dict[key] += ' or ' + value
+            #global myx
+            #self.ef_dict[key+'-A'+str(myx)] = value
+            #myx += 1
 
     def sub_ef_dict_vals(self):
         # substitute known values into other key's definitions
-        for sk,sv in self.ef_dict.items():
-            for k,v in self.ef_dict.items():
-                self.ef_dict[k] = v.replace(sk,sv)
+        for sk,sv in self.ef_dict.items():     # SUBKEY sk and SUBVAL sv: f_1 = V(t)
+            for k,v in self.ef_dict.items():   # key, val k, v   f_2 = 2*f_1 -> 2*V(t)
+                vold = v[:]
+                #print(f'FOR KEY {k}, replacing {sk} with {sv} in {v}', end=' ')
+                #x = input("?")
+                pattern = sk+r'(?![0-9])' # negative lookahead assertion
+                repl    = sv
+                vnew = re.sub(pattern,repl,vold)
+                #self.ef_dict[k] = v.replace(sk,sv)
+                self.ef_dict[k] = vnew
+                if vold != vnew:
+                    print(f'[{sk:6s}] to [{sv:6s}] for [{vold:20s}] >> [{vnew:20s}]')
 
     def add_bond(self, bond):
         self.bonds.append(bond)
@@ -286,10 +323,10 @@ class system(object):
             bstring = f'bond({bond.num},"{bond.nls}","{bond.nrs}","{bond.csd}", "{bond.ped}"),\n'
             rstring += bstring
         rstring += '])'
-        return rstring
+        return rstring# }}}
 
 class element(object):
-    def __init__(self, name=None):
+    def __init__(self, name=None):# {{{
         self.name = name
         self.etype = self.get_type_from_name()
         self.ports = []
@@ -324,39 +361,39 @@ class element(object):
             return self.value
         else:
             self.value = 'f'
-            return self.value
+            return self.value# }}}
 
 class elem_SF(element):
     def __init__(self, name, bond):
-        super().__init__(name)
+        super().__init__(name)# {{{
         self.bond = bond
         self.value = 'F(t)_'+str(bond.num)
-        self.f = self.value
+        self.f = self.value# }}}
 
 class elem_SE(element):
     def __init__(self, name, bond):
-        super().__init__(name)
+        super().__init__(name)# {{{
         self.bond = bond
         self.value = 'E(t)_'+str(bond.num)
-        self.e = self.value
+        self.e = self.value# }}}
 
 class elem_I(element):
     def __init__(self, name, bond):
-        super().__init__(name)
+        super().__init__(name)# {{{
         self.bond = bond
         self.value = 'p/I_'+str(bond.num)
-        self.f = self.value
+        self.f = self.value# }}}
 
 class elem_C(element):
     def __init__(self, name, bond):
-        super().__init__(name)
+        super().__init__(name)# {{{
         self.bond = bond
         self.value = 'q/C_'+str(bond.num)
-        self.e = self.value
+        self.e = self.value# }}}
 
 class elem_R(element):
     def __init__(self, name, bond):
-        super().__init__(name)
+        super().__init__(name)# {{{
         self.bond = bond
         appnum = '_'+str(bond.num)
         self.param = 'R' + appnum
@@ -368,12 +405,10 @@ class elem_R(element):
             self.value = self.f
         else:
             # R gives e
-            self.value = self.e
-
-
+            self.value = self.e# }}}
 
 class elem_TF(element):
-    def __init__(self, name, b1, b2):
+    def __init__(self, name, b1, b2):# {{{
         super().__init__(name)
         self.value = name+'.m'
         self.e = 'e_' + str(b1.num)
@@ -449,10 +484,10 @@ class elem_TF(element):
 
                 # push values to bonds
                 self.p2['b'].set_f(self.p2['f'])
-                self.p1['b'].set_e(self.p1['e'])
+                self.p1['b'].set_e(self.p1['e'])# }}}
 
 class elem_0J(element):
-    def __init__(self, name, bonds):
+    def __init__(self, name, bonds):# {{{
         super().__init__(name)
         self.bonds = bonds
         self.sb = self.get_sb()
@@ -501,8 +536,8 @@ class elem_0J(element):
             if b.is_ped_into_elem(self.name):
                 fstring = "-("+s+")"
             else:
-                #fstring = "+("+s+")"
-                fstring = s
+                fstring = "("+s+")"
+                #fstring = s
             b.set_f(fstring)
 
     def sumfs(self, bcurr):
@@ -512,14 +547,14 @@ class elem_0J(element):
             b = self.bonds[i]
             if b != bcurr:
                 if b.is_ped_into_elem(self.name):
-                    s += " + "+"f_"+str(b.num)
+                    s += " +"+"f_"+str(b.num)
                 else:
-                    s += " - "+"f_"+str(b.num)
-        return s
+                    s += " -"+"f_"+str(b.num)
+        return s# }}}
 
 class elem_1J(element):
     def __init__(self, name, bonds):
-        super().__init__(name)
+        super().__init__(name)# {{{
         self.bonds = bonds
         self.sb = self.get_sb()
 
@@ -570,8 +605,8 @@ class elem_1J(element):
             if b.is_ped_into_elem(self.name):
                 fstring = "-("+s+")"
             else:
-                #fstring = "+("+s+")"
-                fstring = s
+                fstring = "("+s+")"
+                #fstring = s
             b.set_e(fstring)
 
     def sumes(self, bcurr):
@@ -581,14 +616,13 @@ class elem_1J(element):
             b = self.bonds[i]
             if b != bcurr:
                 if b.is_ped_into_elem(self.name):
-                    s += " + "+"e_"+str(b.num)
+                    s += " +"+"e_"+str(b.num)
                 else:
-                    s += " - "+"e_"+str(b.num)
-        return s
-
+                    s += " -"+"e_"+str(b.num)
+        return s# }}}
 
 def elem_gets(ename, bond):
-    if   bond.nrs == ename and bond.csd == 'R':
+    if   bond.nrs == ename and bond.csd == 'R':# {{{
         # elem gets e
         return 'e'
     elif bond.nls == ename and bond.csd == 'L':
@@ -596,11 +630,10 @@ def elem_gets(ename, bond):
         return 'e'
     else:
         # elem gets f
-        return 'f'
-
+        return 'f'# }}}
 
 def elem_gives(ename, bond):
-    if   bond.nrs == ename and bond.csd == 'R':
+    if   bond.nrs == ename and bond.csd == 'R':# {{{
         # elem gives f
         return 'f'
     elif bond.nls == ename and bond.csd == 'L':
@@ -608,11 +641,11 @@ def elem_gives(ename, bond):
         return 'f'
     else:
         # elem gives e
-        return 'e'
+        return 'e'# }}}
 
 # helper function to create an element from its name
 def get_elem_from_name(name, bonds):
-    sn = str(name)
+    sn = str(name)# {{{
     if   sn.startswith('SE'):
         return elem_SE(sn, bonds[0])
     elif sn.startswith('R'):
@@ -628,5 +661,5 @@ def get_elem_from_name(name, bonds):
     elif sn.startswith('TF'):
         return elem_TF(sn, bonds[0], bonds[1])
     else: # SF
-        return elem_SF(sn, bonds[0])
+        return elem_SF(sn, bonds[0])# }}}
 

@@ -151,25 +151,47 @@ f_dict = {
 #
 #
 #
-# bonds.append(bond.from_bond_string('[1J-5 ] | __17__>  [TF.an]' )
-# bonds.append(bond.from_bond_string('[TF.an] | __18__>  [1J-6 ]' )
-# bonds.append(bond.from_bond_string('[Ra   ]  <__19__ | [1J-6 ]' )
-# bonds.append(bond.from_bond_string('[1J-6 ] | __20__>  [Rv70 ]' )
-# bonds.append(bond.from_bond_string('[1J-6 ] | __21__>  [Rv20 ]' )
-# bonds.append(bond.from_bond_string('[1J-6 ] | __22__>  [0J-1 ]' )
+# bonds.append(bond.from_bond_string('[1J-5 ] | __17__>  [TF.an]' ))
+# bonds.append(bond.from_bond_string('[TF.an] | __18__>  [1J-6 ]' ))
+# bonds.append(bond.from_bond_string('[Ra   ]  <__19__ | [1J-6 ]' ))
+# bonds.append(bond.from_bond_string('[1J-6 ] | __20__>  [Rv70 ]' ))
+# bonds.append(bond.from_bond_string('[1J-6 ] | __21__>  [Rv20 ]' ))
+# bonds.append(bond.from_bond_string('[1J-6 ] | __22__>  [0J-1 ]' ))
 #
-# bonds.append(bond.from_bond_string('[SE   ]  <__16__ | [1J-5 ]' )
-# bonds.append(bond.from_bond_string('[1J-4 ] |<__11__   [0J-1 ]' )
-# bonds.append(bond.from_bond_string('[0J-1 ] | __10__>  [1J-3 ]' )
-# bonds.append(bond.from_bond_string('[Rv40 ]  <__ 9__ | [1J-3 ]' )
-# bonds.append(bond.from_bond_string('[1J-3 ] | __ 8__>  [Rl40 ]' )
-# bonds.append(bond.from_bond_string('[1J-3 ] | __ 7__>  [0J-2 ]' )
-# bonds.append(bond.from_bond_string('[1J-2 ] | __ 6__>  [Cacc1]' )
-# bonds.append(bond.from_bond_string('[Rp2  ]  <__ 5__ | [1J-2 ]' )
-# bonds.append(bond.from_bond_string('[0J-2 ] | __ 4__>  [1J-2 ]' )
-# bonds.append(bond.from_bond_string('[0J-2 ]   __ 3__>| [1J-1 ]' )
-# bonds.append(bond.from_bond_string('[1J-1 ]   __ 2__>| [Rp3  ]' )
-# bonds.append(bond.from_bond_string('[1J-1 ] | __ 1__>  [Cacc2]' )
+# bonds.append(bond.from_bond_string('[SE   ]  <__16__ | [1J-5 ]' ))
+# bonds.append(bond.from_bond_string('[1J-4 ] |<__11__   [0J-1 ]' ))
+# bonds.append(bond.from_bond_string('[0J-1 ] | __10__>  [1J-3 ]' ))
+# bonds.append(bond.from_bond_string('[Rv40 ]  <__ 9__ | [1J-3 ]' ))
+# bonds.append(bond.from_bond_string('[1J-3 ] | __ 8__>  [Rl40 ]' ))
+# bonds.append(bond.from_bond_string('[1J-3 ] | __ 7__>  [0J-2 ]' ))
+# bonds.append(bond.from_bond_string('[1J-2 ] | __ 6__>  [Cacc1]' ))
+# bonds.append(bond.from_bond_string('[Rp2  ]  <__ 5__ | [1J-2 ]' ))
+# bonds.append(bond.from_bond_string('[0J-2 ] | __ 4__>  [1J-2 ]' ))
+# bonds.append(bond.from_bond_string('[0J-2 ]   __ 3__>| [1J-1 ]' ))
+# bonds.append(bond.from_bond_string('[1J-1 ]   __ 2__>| [Rp3  ]' ))
+# bonds.append(bond.from_bond_string('[1J-1 ] | __ 1__>  [Cacc2]' ))
+
+
+# 4 BOND SYSTEM
+                                     # 12345              12345
+# bonds.append(bond.from_bond_string('[SE   ]   __ 1__>| [1J-1 ]' ))
+# bonds.append(bond.from_bond_string('[Im   ] |<__ 3__   [1J-1 ]' ))
+# bonds.append(bond.from_bond_string('[Rd   ]  <__ 4__ | [1J-1 ]' ))
+# bonds.append(bond.from_bond_string('[Cs   ]  <__ 2__ | [1J-1 ]' ))
+
+# FIG 5.15 example
+bonds.append(bond.from_bond_string('[SF.vi] | __ 1__>  [0J-1 ]' ))
+bonds.append(bond.from_bond_string('[0J-1 ] | __ 2__>  [0J-1 ]' ))
+bonds.append(bond.from_bond_string('[0J-1 ]   __ 3__>| [1J-1 ]' ))
+bonds.append(bond.from_bond_string('[SE.us]  <__ 4__ | [1J-1 ]' ))
+bonds.append(bond.from_bond_string('[1J-1 ]   __ 5__>| [I.ms ]' ))
+bonds.append(bond.from_bond_string('[1J-1 ] | __ 6__>  [0J-2 ]' ))
+bonds.append(bond.from_bond_string('[0J-2 ] | __ 7__>  [1J-3 ]' ))
+bonds.append(bond.from_bond_string('[1J-3 ] | __ 8__>  [R    ]' ))
+bonds.append(bond.from_bond_string('[1J-3 ] | __ 9__>  [C    ]' ))
+bonds.append(bond.from_bond_string('[0J-2 ]   __10__>| [1J-2 ]' ))
+bonds.append(bond.from_bond_string('[SE.s ]  <__11__ | [1J-2 ]' ))
+bonds.append(bond.from_bond_string('[1J-2 ]   __12__>| [I    ]' ))
 
 TFE system
 system([bond(15,"I","1J-5","L", "L"),
@@ -205,6 +227,8 @@ bond(22,"1J-6","0J-1","L", "R"),
   * get_bond_num(self,e1,e2)
   * get_single_ports(self)
   * get_two_ports(self)
+  * plot_system(self)
+  * sub_ef_dict_vals(self)
 
 # bond
   props: [nls, nrs, num, e, f, csd, ped]
@@ -250,8 +274,34 @@ bond(22,"1J-6","0J-1","L", "R"),
 
 - [✓] now i need to fix the TF behavior to get f e directly
 - [✓] make other 1-elem get f e instead of value too
+- [✓] plot graph of system
+- [ ] define GY element
+- [ ] write method to return equations
 
-# loop over multi-ports
-- [ ] 0J
-- [ ] 1J
+LIMITATION
+* unique nodes need to be named uniquely
+
+# ISSUE
+
+str.replace(subkey, subvalue)
+replaces a subkey with subvalue even if subkey is a substring of another larger string i dont want to touch.
+IE not an exact match.
+
+
+[C:2  ] [qdot_2]: +( + F(t)_1 - +( + F(t)_1 - +( + F(t)_1 - f_3)))
+
+[qdot_2]:  + F(t)_1 - +( + F(t)_1 - +( + F(t)_1 - f_3))
+[qdot_2]:    F(t)_1 -  (   F(t)_1 -  (   F(t)_1 - f_3))
+[qdot_2]:    F(t)_1 - f_3
+
+
+
+
+
+[I:5  ] [pdot_5]: +( + q/C_2 - E(t)_4 - +( + q/C_2 - E(t)_4 - +( + q/C_2 - E(t)_4 - e_6)))
+
+[C:9  ] [qdot_9]: +( + p/I_5 - +( + p/I_5 - +( + p/I_5 - f_10)))
+
+[I:12 ] [pdot_12]: +( + -( - R_8*+( + p/I_5 - +( + p/I_5 - +( + p/I_5 - f_10))) - q/C_9) - E(t)_11)
+
 
